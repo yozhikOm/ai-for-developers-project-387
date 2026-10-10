@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/yozhikOm/ai-for-developers-project-387/compare/call-calendar-v1.1.0...call-calendar-v1.2.0) (2026-10-10)
+
+
+### Features
+
+* add all app files ([882821d](https://github.com/yozhikOm/ai-for-developers-project-387/commit/882821da3b478ab03ba77ec2dd3b33c6bbd954f6))
+
+
+### Bug Fixes
+
+* wrong version ([0121b4d](https://github.com/yozhikOm/ai-for-developers-project-387/commit/0121b4d2dff9e78095696dac9d326541ce606c13))
+
 ## [1.1.0](https://github.com/yozhikOm/ai-for-developers-project-386/compare/call-calendar-v1.0.0...call-calendar-v1.1.0) (2026-10-08)
 
 
