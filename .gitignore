@@ -1,0 +1,18 @@
+# Зависимости
+node_modules/
+
+# Сборка frontend (apps/web/dist) и прочие артефакты сборки
+dist/
+
+# Файлы SQLite (DATABASE_PATH, по умолчанию data/calendar.db)
+data/
+
+# Локальные переменные окружения (в репозитории — только .env.example)
+.env
+
+# Результаты и отчёты Playwright (npm run e2e)
+test-results/
+playwright-report/
+
+# Логи и временные файлы
+*.log

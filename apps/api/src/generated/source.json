@@ -1,0 +1,592 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Календарь звонков",
+    "version": "0.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/api/bookings": {
+      "post": {
+        "operationId": "createBooking",
+        "description": "Создаёт Booking на свободный Slot. Конец вычисляет сервер; занятый Slot отклоняется\nс `SLOT_TAKEN` (409), недоступное начало — с `SLOT_UNAVAILABLE` (422).",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Booking"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewBooking"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bookings/upcoming": {
+      "get": {
+        "operationId": "listUpcomingBookings",
+        "description": "Текущая и предстоящие Booking для раздела Owner; пагинации нет.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpcomingBookings"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/event-types": {
+      "get": {
+        "operationId": "listEventTypes",
+        "description": "Все EventType по возрастанию времени создания.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EventType"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createEventType",
+        "description": "Создаёт EventType и возвращает его с назначенным id (нужен для подсветки в списке Owner).",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventType"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewEventType"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/event-types/{eventTypeId}": {
+      "get": {
+        "operationId": "getEventType",
+        "description": "Один EventType: для прямой ссылки на выбор времени и перезагрузки страницы.",
+        "parameters": [
+          {
+            "name": "eventTypeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventType"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/event-types/{eventTypeId}/slots": {
+      "get": {
+        "operationId": "listSlots",
+        "description": "Всё BookingWindow одним ответом: 14 дней начиная с сегодняшнего по поясу Owner\nсо слотами EventType. Окно, «сегодня», выходные и MinimumNotice определяет сервер.",
+        "parameters": [
+          {
+            "name": "eventTypeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingWindowDay"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "getHealth",
+        "description": "Проверка живости: используется smoke-тестом и Docker HEALTHCHECK.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/owner": {
+      "get": {
+        "operationId": "getOwner",
+        "description": "Имя и часовой пояс Owner.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Owner"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ApiErrorCode"
+          },
+          "message": {
+            "type": "string",
+            "description": "Описание для разработчика; пользователю UI показывает свой текст по `code`."
+          }
+        },
+        "description": "Единая модель ошибки API."
+      },
+      "ApiErrorCode": {
+        "type": "string",
+        "enum": [
+          "VALIDATION_ERROR",
+          "NOT_FOUND",
+          "EVENT_TYPE_NOT_FOUND",
+          "SLOT_TAKEN",
+          "SLOT_UNAVAILABLE",
+          "INTERNAL_ERROR"
+        ],
+        "description": "Машиночитаемая причина ошибки: клиент различает отказы по ней, а не по тексту."
+      },
+      "Booking": {
+        "type": "object",
+        "required": [
+          "id",
+          "start",
+          "end",
+          "guestName",
+          "guestEmail",
+          "createdAt",
+          "eventType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Системный id (UUID): его назначает сервер."
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Начало (UTC)."
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Конец (UTC): начало плюс длительность EventType, без Buffer."
+          },
+          "guestName": {
+            "type": "string",
+            "description": "Имя Guest."
+          },
+          "guestEmail": {
+            "type": "string",
+            "description": "Email Guest; регистр не меняется."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Момент создания."
+          },
+          "eventType": {
+            "$ref": "#/components/schemas/EventTypeSummary"
+          }
+        },
+        "description": "Booking — бронь Guest на интервал `[начало, конец)`."
+      },
+      "BookingWindowDay": {
+        "type": "object",
+        "required": [
+          "date",
+          "isWorkingDay",
+          "slots"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "Календарная дата по поясу Owner."
+          },
+          "isWorkingDay": {
+            "type": "boolean",
+            "description": "Рабочий ли день; у нерабочего (выходного) слотов нет."
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "description": "Слоты дня по возрастанию начала. Прошедших и попавших в MinimumNotice нет вовсе,\nпоэтому у рабочего дня список может быть пустым."
+          }
+        },
+        "description": "День BookingWindow со слотами выбранного EventType."
+      },
+      "EventType": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "durationMinutes",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Системный id (UUID): его назначает сервер."
+          },
+          "name": {
+            "type": "string",
+            "description": "Название; не уникально."
+          },
+          "description": {
+            "type": "string",
+            "description": "Необязательное описание; без описания поле отсутствует."
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Длительность звонка в минутах."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Момент создания: по нему упорядочен список типов."
+          }
+        },
+        "description": "EventType — вид звонка, который публикует Owner; Guest бронирует время в его рамках."
+      },
+      "EventTypeSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "description": "Сводка EventType внутри Booking."
+      },
+      "Health": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok"
+            ]
+          }
+        },
+        "description": "Ответ проверки живости."
+      },
+      "NewBooking": {
+        "type": "object",
+        "required": [
+          "eventTypeId",
+          "start",
+          "guestName",
+          "guestEmail"
+        ],
+        "properties": {
+          "eventTypeId": {
+            "type": "string",
+            "description": "EventType, в рамках которого Guest бронирует время."
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Начало выбранного Slot (UTC); сервер заново проверяет все правила на момент запроса."
+          },
+          "guestName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Имя Guest. Сервер обрезает пробелы по краям, имя из одних пробелов — пустое."
+          },
+          "guestEmail": {
+            "type": "string",
+            "maxLength": 254,
+            "pattern": "^\\s*[^\\s@]+@[^\\s@]+\\.[^\\s@]+\\s*$",
+            "description": "Email Guest. Пробелы по краям допустимы: сервер их обрезает."
+          }
+        },
+        "description": "Данные новой Booking; конец, id и момент создания назначает сервер."
+      },
+      "NewEventType": {
+        "type": "object",
+        "required": [
+          "name",
+          "durationMinutes"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Название; не уникально. Сервер обрезает пробелы по краям, название из одних пробелов — пустое."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Необязательное описание; пустое после обрезки пробелов означает «нет описания»."
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 15,
+            "maximum": 540,
+            "description": "Длительность звонка в минутах, кратная 15: кратность контракт выразить не может, её проверяет сервер."
+          }
+        },
+        "description": "Данные нового EventType; id и момент создания назначает сервер."
+      },
+      "Owner": {
+        "type": "object",
+        "required": [
+          "name",
+          "timezone"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Имя, которое видит Guest на публичной странице."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA-пояс Owner (например, `Europe/Moscow`): в нём считается и показывается время."
+          }
+        },
+        "description": "Owner — владелец календаря; задаётся конфигурацией сервера."
+      },
+      "Slot": {
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "status"
+        ],
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Начало (UTC)."
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Конец (UTC): начало плюс длительность EventType."
+          },
+          "status": {
+            "$ref": "#/components/schemas/SlotStatus"
+          }
+        },
+        "description": "Slot — интервал `[начало, конец)` длиной в длительность EventType; вычисляется, не хранится."
+      },
+      "SlotStatus": {
+        "type": "string",
+        "enum": [
+          "free",
+          "taken"
+        ],
+        "description": "Статус Slot: «свободен» или «занят» пересечением с Booking с учётом Buffer."
+      },
+      "UpcomingBookings": {
+        "type": "object",
+        "required": [
+          "upcoming"
+        ],
+        "properties": {
+          "current": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Booking"
+              }
+            ],
+            "description": "Идущая сейчас Booking (начало ≤ сейчас < конец); если такой нет, поле отсутствует."
+          },
+          "upcoming": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Booking"
+            },
+            "description": "Booking с началом позже текущего момента, по возрастанию начала."
+          }
+        },
+        "description": "Предстоящие Booking всех EventType для Owner. «Текущая» и «предстоящая» — производные\nсостояния: сервер вычисляет их на момент запроса, закончившиеся Booking не попадают никуда."
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+# TypeSpec → OpenAPI 3.0.0 (версия по умолчанию: совместима с Ajv draft-07 в Fastify)
+emit:
+  - "@typespec/openapi3"
+options:
+  "@typespec/openapi3":
+    emitter-output-dir: "{project-root}/generated"
+    output-file: "openapi.yaml"

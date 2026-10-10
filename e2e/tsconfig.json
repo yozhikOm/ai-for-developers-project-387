@@ -1,0 +1,18 @@
+{
+  // Только проверка типов e2e-сценария и конфига Playwright (npm run typecheck):
+  // запускает и транспилирует их сам Playwright
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": ["esnext", "dom"],
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": [".", "../playwright.config.ts"]
+}

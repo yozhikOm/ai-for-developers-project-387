@@ -1,0 +1,46 @@
+{
+  "name": "call-calendar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Сервис бронирования календаря (учебный проект Хекслета)",
+  "type": "module",
+  "packageManager": "npm@11.12.0",
+  "engines": {
+    "node": ">=24.12"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w @app/api",
+    "dev:web": "npm run dev -w @app/web",
+    "build": "npm run build -w @app/web",
+    "start": "npm run start -w @app/api",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "npm run typecheck -w @app/api && npm run typecheck -w @app/web && tsc -p e2e",
+    "check": "npm run lint && npm run typecheck && npm test",
+    "smoke": "node scripts/smoke.mjs",
+    "e2e": "playwright test",
+    "docker:build": "docker build -t call-calendar .",
+    "docker:run": "docker run --rm -p 3000:3000 -v call-calendar-data:/app/data call-calendar",
+    "generate": "tsp compile contract && openapi-ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@hey-api/openapi-ts": "0.99.0",
+    "@playwright/test": "^1.64.0",
+    "@typespec/compiler": "^1.16.0",
+    "@typespec/http": "^1.16.0",
+    "@typespec/openapi": "^1.16.0",
+    "@typespec/openapi3": "^1.16.0",
+    "eslint": "^10.11.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.12.0",
+    "typescript-eslint": "^8.70.1",
+    "vitest": "^5.0.2"
+  }
+}
