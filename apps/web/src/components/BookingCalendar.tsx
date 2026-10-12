@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useId } from 'react'
 import type { BookingWindowDay } from '@/api/generated'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -22,18 +22,28 @@ type BookingCalendarProps = {
   timeZone: string
   selectedDate?: string
   onSelectDate: (date: string) => void
+  // Показанный месяц: индекс в списке months. Живёт в BookingPage, чтобы переживать
+  // размонтирование календаря (возврат после «Изменить» или отказа брони)
+  monthIndex: number
+  onMonthIndexChange: (monthIndex: number) => void
 }
 
 // Месячный календарь BookingWindow. Активны только рабочие дни окна, у них —
 // счётчик свободных слотов. Стрелки листают месяцы, которые захватывает окно.
-function BookingCalendar({ days, timeZone, selectedDate, onSelectDate }: BookingCalendarProps) {
+function BookingCalendar({
+  days,
+  timeZone,
+  selectedDate,
+  onSelectDate,
+  monthIndex,
+  onMonthIndexChange,
+}: BookingCalendarProps) {
   const headingId = useId()
   const daysByDate = new Map(days.map((day) => [day.date, day]))
   // Окно в 14 дней захватывает один или два месяца
   const months = days.map((day) => monthOf(day.date)).filter(
     (month, index, all) => index === 0 || !isSameMonth(month, all[index - 1]),
   )
-  const [monthIndex, setMonthIndex] = useState(0)
   const month = months[monthIndex]
 
   return (
@@ -44,7 +54,7 @@ function BookingCalendar({ days, timeZone, selectedDate, onSelectDate }: Booking
           variant="outline"
           aria-label="Предыдущий месяц"
           disabled={monthIndex === 0}
-          onClick={() => setMonthIndex(monthIndex - 1)}
+          onClick={() => onMonthIndexChange(monthIndex - 1)}
         >
           ←
         </Button>
@@ -56,7 +66,7 @@ function BookingCalendar({ days, timeZone, selectedDate, onSelectDate }: Booking
           variant="outline"
           aria-label="Следующий месяц"
           disabled={monthIndex >= months.length - 1}
-          onClick={() => setMonthIndex(monthIndex + 1)}
+          onClick={() => onMonthIndexChange(monthIndex + 1)}
         >
           →
         </Button>
