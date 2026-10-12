@@ -1,7 +1,7 @@
 # Трекер задач: GitHub
 
 Задачи и спеки этого репозитория живут как GitHub issues в
-`yozhikOm/ai-for-developers-project-386`. Все операции — через CLI `gh`.
+`yozhikOm/ai-for-developers-project-387`. Все операции — через CLI `gh`.
 
 ## Конвенции
 

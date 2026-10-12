@@ -106,7 +106,7 @@ Backend запускается Node.js 24 напрямую из `.ts`-исход
 
 ### Issue tracker
 
-Задачи ведутся в GitHub Issues репозитория `yozhikOm/ai-for-developers-project-386`,
+Задачи ведутся в GitHub Issues репозитория `yozhikOm/ai-for-developers-project-387`,
 все операции — через CLI `gh`. См. `docs/agents/issue-tracker.md`.
 
 ### Triage labels
