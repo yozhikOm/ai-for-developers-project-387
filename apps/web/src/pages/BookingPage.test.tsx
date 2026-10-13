@@ -468,6 +468,22 @@ describe('подтверждение и создание Booking', () => {
     expect(continueButton()).toBeEnabled()
   })
 
+  it('«Изменить» открывает календарь на месяце выбранного дня за пределами первого месяца', async () => {
+    // Окно на стыке месяцев: с понедельника 26 октября по воскресенье 8 ноября
+    stubBookingApi({ days: bookingWindow('2026-10-26') })
+    await openBookingPage()
+    await userEvent.click(screen.getByRole('button', { name: 'Следующий месяц' }))
+    await userEvent.click(dayButton('понедельник, 2 ноября'))
+    await userEvent.click(slotButton('09:00–09:30'))
+    await userEvent.click(continueButton())
+    await screen.findByRole('heading', { name: 'Подтверждение записи' })
+
+    await userEvent.click(screen.getByRole('button', { name: 'Изменить' }))
+
+    expect(screen.getByRole('heading', { name: 'Ноябрь 2026' })).toBeInTheDocument()
+    expect(dayButton('понедельник, 2 ноября')).toHaveAttribute('aria-pressed', 'true')
+  })
+  
   it('«Подтвердить запись» отправляет createBooking с обрезанными значениями и показывает подтверждение', async () => {
     const fetchMock = stubBookingApi({
       days: bookingWindow('2026-10-06', { '2026-10-07': ['free', 'free', 'free'] }),
