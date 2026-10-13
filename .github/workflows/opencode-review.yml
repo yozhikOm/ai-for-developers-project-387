@@ -1,0 +1,31 @@
+name: OpenCode PR Review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+jobs:
+  opencode-review:
+    # Включаем проверку так, чтобы бот реагировал на код человека.
+    # PR от bot-аккаунтов пропускаем.
+    if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Нужен для аутентификации через GitHub Actions
+      contents: read # Достаточно для чтения кода и diff
+      pull-requests: read # Достаточно для чтения данных PR
+      issues: read # write нужен только при use_github_token: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Run OpenCode review
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
+        with:
+          model: opencode/big-pickle
+          prompt: |
+            Review this pull request:
+            - Find bugs and risky changes
+            - Check readability and maintainability
+            - Leave actionable review comments
