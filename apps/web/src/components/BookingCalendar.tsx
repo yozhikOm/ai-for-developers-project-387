@@ -1,8 +1,9 @@
-import { useId } from 'react'
+import { useId, useState } from 'react'
 import type { BookingWindowDay } from '@/api/generated'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
+  type CalendarMonth,
   dayOfMonth,
   formatDayLabel,
   formatMonth,
@@ -15,6 +16,14 @@ import { cn } from '@/lib/utils'
 
 const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 
+// Индекс месяца, которому принадлежит date; 0, если date нет или он вне окна
+function monthIndexOf(months: CalendarMonth[], date?: string): number {
+  if (!date) return 0
+  const month = monthOf(date)
+  const index = months.findIndex((candidate) => isSameMonth(candidate, month))
+  return index === -1 ? 0 : index
+}
+
 type BookingCalendarProps = {
   // Дни BookingWindow из listSlots, по возрастанию даты
   days: BookingWindowDay[]
@@ -22,28 +31,20 @@ type BookingCalendarProps = {
   timeZone: string
   selectedDate?: string
   onSelectDate: (date: string) => void
-  // Показанный месяц: индекс в списке months. Живёт в BookingPage, чтобы переживать
-  // размонтирование календаря (возврат после «Изменить» или отказа брони)
-  monthIndex: number
-  onMonthIndexChange: (monthIndex: number) => void
 }
 
 // Месячный календарь BookingWindow. Активны только рабочие дни окна, у них —
 // счётчик свободных слотов. Стрелки листают месяцы, которые захватывает окно.
-function BookingCalendar({
-  days,
-  timeZone,
-  selectedDate,
-  onSelectDate,
-  monthIndex,
-  onMonthIndexChange,
-}: BookingCalendarProps) {
+// Показанный месяц — локальное состояние: на монтировании это месяц выбранного
+// дня, поэтому возврат после «Изменить» или отказа брони открывает его на месте.
+function BookingCalendar({ days, timeZone, selectedDate, onSelectDate }: BookingCalendarProps) {
   const headingId = useId()
   const daysByDate = new Map(days.map((day) => [day.date, day]))
   // Окно в 14 дней захватывает один или два месяца
   const months = days.map((day) => monthOf(day.date)).filter(
     (month, index, all) => index === 0 || !isSameMonth(month, all[index - 1]),
   )
+  const [monthIndex, setMonthIndex] = useState(() => monthIndexOf(months, selectedDate))
   const month = months[monthIndex]
 
   return (
@@ -54,7 +55,7 @@ function BookingCalendar({
           variant="outline"
           aria-label="Предыдущий месяц"
           disabled={monthIndex === 0}
-          onClick={() => onMonthIndexChange(monthIndex - 1)}
+          onClick={() => setMonthIndex(monthIndex - 1)}
         >
           ←
         </Button>
@@ -66,7 +67,7 @@ function BookingCalendar({
           variant="outline"
           aria-label="Следующий месяц"
           disabled={monthIndex >= months.length - 1}
-          onClick={() => onMonthIndexChange(monthIndex + 1)}
+          onClick={() => setMonthIndex(monthIndex + 1)}
         >
           →
         </Button>

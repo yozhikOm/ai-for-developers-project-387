@@ -43,15 +43,14 @@ const STEPS = ['Тип встречи', 'Дата и время', 'Ваши да
 
 // Запись на звонок для EventType (/booking/:eventTypeId): шаги «Дата и время» и «Ваши данные»,
 // затем подтверждение брони. Открывается и по прямой ссылке: всё нужное загружает сам по id из URL.
-// Выбранные день, слот и показанный месяц живут здесь, поэтому «Изменить» возвращает
-// к выбору времени с ними: календарь открыт на месяце выбранного дня.
+// Выбранные день и слот живут здесь, поэтому «Изменить» возвращает к выбору времени
+// с ними: календарь открывается на месяце выбранного дня.
 function BookingPage() {
   const { eventTypeId = '' } = useParams()
   const [state, setState] = useState<PageState>({ status: 'loading' })
   const [step, setStep] = useState<BookingStep>({ name: 'time' })
   const [selectedDate, setSelectedDate] = useState<string>()
   const [selectedSlot, setSelectedSlot] = useState<Slot>()
-  const [monthIndex, setMonthIndex] = useState(0)
 
   // Слот выбирается внутри дня: при смене дня выбор сбрасывается
   function selectDate(date: string) {
@@ -159,8 +158,6 @@ function BookingPage() {
                 timeZone={state.owner.timezone}
                 selectedDate={selectedDate}
                 onSelectDate={selectDate}
-                monthIndex={monthIndex}
-                onMonthIndexChange={setMonthIndex}
               />
               <SlotList
                 day={state.days.find((day) => day.date === selectedDate)}
