@@ -33,6 +33,8 @@ function BookingCalendar({ days, timeZone, selectedDate, onSelectDate }: Booking
   const months = days.map((day) => monthOf(day.date)).filter(
     (month, index, all) => index === 0 || !isSameMonth(month, all[index - 1]),
   )
+  // Календарь перемонтируется при возврате на шаг выбора времени («Изменить», отказ
+  // createBooking): открываем месяц выбранного дня, а не первый месяц окна
   const [monthIndex, setMonthIndex] = useState(() => {
     if (!selectedDate) return 0
     const index = months.findIndex((month) => isSameMonth(month, monthOf(selectedDate)))
