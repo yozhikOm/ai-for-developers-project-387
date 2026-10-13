@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/yozhikOm/ai-for-developers-project-387/compare/call-calendar-v1.1.0...call-calendar-v1.1.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* **web:** calendar month reset on return ([#9](https://github.com/yozhikOm/ai-for-developers-project-387/issues/9)) ([419843a](https://github.com/yozhikOm/ai-for-developers-project-387/commit/419843ab696fbe6691716806846bfe3ead30b55d))
+
 ## [1.1.0](https://github.com/yozhikOm/ai-for-developers-project-386/compare/call-calendar-v1.0.0...call-calendar-v1.1.0) (2026-10-08)
 
 
