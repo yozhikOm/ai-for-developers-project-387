@@ -30,4 +30,23 @@ jobs:
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
         with:
-          model: opencode/big-pickle
+          model: opencode/kimi-k3
+          prompt: |
+              Follow the repository's AGENTS.md instructions.
+              Before committing any changes, read the root AGENTS.md
+              and follow its commit message conventions.
+
+              All commit messages MUST use Conventional Commits:
+              <type>: <description>
+              or <type>(<scope>): <description>
+
+              Examples:
+              - fix: calendar month reset on return
+              - feat(web): add booking confirmation
+              - test(api): cover missing event type
+
+              Never use a plain descriptive sentence as a commit message.
+              Before creating each commit, verify that its message
+              follows Conventional Commits. If it does not, rewrite it.
+              
+              Continue to follow the user's request from the GitHub comment.
