@@ -3,6 +3,7 @@ import type { BookingWindowDay } from '@/api/generated'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
+  type CalendarMonth,
   dayOfMonth,
   formatDayLabel,
   formatMonth,
@@ -15,6 +16,14 @@ import { cn } from '@/lib/utils'
 
 const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 
+// Индекс месяца, которому принадлежит date; 0, если date нет или он вне окна
+function monthIndexOf(months: CalendarMonth[], date?: string): number {
+  if (!date) return 0
+  const month = monthOf(date)
+  const index = months.findIndex((candidate) => isSameMonth(candidate, month))
+  return index === -1 ? 0 : index
+}
+
 type BookingCalendarProps = {
   // Дни BookingWindow из listSlots, по возрастанию даты
   days: BookingWindowDay[]
@@ -26,6 +35,8 @@ type BookingCalendarProps = {
 
 // Месячный календарь BookingWindow. Активны только рабочие дни окна, у них —
 // счётчик свободных слотов. Стрелки листают месяцы, которые захватывает окно.
+// Показанный месяц — локальное состояние: на монтировании это месяц выбранного
+// дня, поэтому возврат после «Изменить» или отказа брони открывает его на месте.
 function BookingCalendar({ days, timeZone, selectedDate, onSelectDate }: BookingCalendarProps) {
   const headingId = useId()
   const daysByDate = new Map(days.map((day) => [day.date, day]))
@@ -33,7 +44,7 @@ function BookingCalendar({ days, timeZone, selectedDate, onSelectDate }: Booking
   const months = days.map((day) => monthOf(day.date)).filter(
     (month, index, all) => index === 0 || !isSameMonth(month, all[index - 1]),
   )
-  const [monthIndex, setMonthIndex] = useState(0)
+  const [monthIndex, setMonthIndex] = useState(() => monthIndexOf(months, selectedDate))
   const month = months[monthIndex]
 
   return (
