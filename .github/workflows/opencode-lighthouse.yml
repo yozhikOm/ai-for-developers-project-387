@@ -1,4 +1,4 @@
-name: Weekly Documentation Audit
+name: Weekly Lighthouse Audit
 
 on:
   schedule:
@@ -13,6 +13,12 @@ jobs:
       pull-requests: read
       issues: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          fetch-depth: 50 # история нужна, чтобы искать виновников среди недавних коммитов
+
       - name: Run Lighthouse
         env:
           LIGHTHOUSE_URL: ${{ secrets.LIGHTHOUSE_URL }}
@@ -34,3 +40,6 @@ jobs:
             For metrics that degraded by more than 10%,
             identify likely culprits in recent commits and
             create an issue with specific recommendations.
+            If docs/performance-baseline.md does not exist,
+            create an issue with the current LCP, CLS, INP values
+            proposing them as the initial baseline.
