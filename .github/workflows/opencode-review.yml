@@ -23,7 +23,7 @@ jobs:
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
         with:
-          model: opencode/big-pickle
+          model: opencode/kimi-k3
           prompt: |
             Review this pull request:
             - Find bugs and risky changes
