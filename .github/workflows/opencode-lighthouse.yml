@@ -1,0 +1,36 @@
+name: Weekly Documentation Audit
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Every Monday at 9am UTC
+  workflow_dispatch:
+jobs:
+  opencode:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: read
+      issues: write
+    steps:
+      - name: Run Lighthouse
+        env:
+          LIGHTHOUSE_URL: ${{ secrets.LIGHTHOUSE_URL }}
+        run: |
+          npx lighthouse "$LIGHTHOUSE_URL" \
+            --output=json \
+            --output-path=./lighthouse-report.json \
+            --chrome-flags="--headless"
+      - name: Analyze with OpenCode
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
+        with:
+          model: opencode/kimi-k3
+          prompt: |
+            Read ./lighthouse-report.json.
+            Compare LCP, CLS, INP with the values in
+            docs/performance-baseline.md.
+            For metrics that degraded by more than 10%,
+            identify likely culprits in recent commits and
+            create an issue with specific recommendations.
