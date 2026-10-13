@@ -483,7 +483,7 @@ describe('подтверждение и создание Booking', () => {
     expect(screen.getByRole('heading', { name: 'Ноябрь 2026' })).toBeInTheDocument()
     expect(dayButton('понедельник, 2 ноября')).toHaveAttribute('aria-pressed', 'true')
   })
-  
+
   it('«Подтвердить запись» отправляет createBooking с обрезанными значениями и показывает подтверждение', async () => {
     const fetchMock = stubBookingApi({
       days: bookingWindow('2026-10-06', { '2026-10-07': ['free', 'free', 'free'] }),
