@@ -88,6 +88,57 @@ docker run --rm -e PORT=8080 -p 8080:8080 call-calendar
 | [Weekly Lighthouse Audit](.github/workflows/opencode-lighthouse.yml) | cron: вт 09:00 UTC | `opencode/kimi-k3` | Lighthouse по `LIGHTHOUSE_URL`, сравнение LCP / CLS / INP с `docs/performance-baseline.md`, issue при деградации | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/opencode-lighthouse.yml), Issues |
 | [Weekly Documentation Audit](.github/workflows/opencode-documentation-audit.yml) | cron: чт 09:00 UTC | `opencode/big-pickle` | Сверка README и `docs/` с кодом: PR с правками и issue с тем, что требует человека | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/opencode-documentation-audit.yml), PR и Issues |
 
+## Самооценка работы агента
+
+Агент — opencode в GitHub Actions (вызов `/oc`, ревью PR, еженедельные аудиты).
+Состояние на 2026-10-14.
+
+**С первого прохода**
+
+- [#11][i11] → [PR #12][p12]: `docs/performance-baseline.md` по одному вызову
+  `/oc`, `npm run check` зелёный, смержен без правок.
+- `/oc explain` в [#4][i4], [#5][i5], [#7][i7]: причина бага «календарь
+  сбрасывается на первый месяц» найдена сразу и верно, со ссылками на строки
+  и планом регрессионного теста.
+- Ревью [PR #9][p9]: поймал посторонний коммит со сменой модели и нарушение
+  Conventional Commits; регрессионный тест перепроверил на коде из `main`.
+- Аудит документации: [PR #13][p13] (битая ссылка) и [#14][i14] с вопросами,
+  которые решает человек.
+
+**Потребовались итерации**
+
+- Баг календаря ([#4][i4] / [#5][i5] / [#7][i7]): задача заводилась трижды,
+  агент открыл два рабочих PR ([#6][p6] — подъём состояния в `BookingPage`,
+  [#8][p8] — точечная инициализация месяца). В `main` ушёл точечный вариант
+  через [PR #9][p9] после трёх раундов ревью: комментарий-инвариант (первый push
+  отклонён как non-fast-forward), trailing whitespace, squash истории.
+- [#3][i3] «Замкнуть цикл брони»: из четырёх вызовов первые упали на неверном
+  id модели (`opencode/BigPickle`), следующие только пересказывали тред; на
+  `explain` агент ответил, что цикл уже собран, а критериев приёмки в issue нет.
+  Не закрыта: нужна постановка от человека.
+- Lighthouse-аудит: первый запуск ([PR #10][p10]) не смог завести issue: не было
+  `GH_TOKEN`, в воркфлоу не хватало checkout и сценария «baseline ещё нет».
+  После правок воркфлоу второй запуск завёл [#11][i11].
+- Перевод тела [PR #6][p6]: без токена агент не смог изменить PR и выложил
+  перевод комментарием.
+
+**Вывод:** с первого прохода агент закрывает узкие задачи с ясным критерием
+готовности, а также диагностику и ревью. Итерации уходили в основном на
+инфраструктуру (id модели, токены, права на push) и на расплывчатые постановки.
+
+[i3]: https://github.com/yozhikOm/ai-for-developers-project-387/issues/3
+[i4]: https://github.com/yozhikOm/ai-for-developers-project-387/issues/4
+[i5]: https://github.com/yozhikOm/ai-for-developers-project-387/issues/5
+[i7]: https://github.com/yozhikOm/ai-for-developers-project-387/issues/7
+[i11]: https://github.com/yozhikOm/ai-for-developers-project-387/issues/11
+[i14]: https://github.com/yozhikOm/ai-for-developers-project-387/issues/14
+[p6]: https://github.com/yozhikOm/ai-for-developers-project-387/pull/6
+[p8]: https://github.com/yozhikOm/ai-for-developers-project-387/pull/8
+[p9]: https://github.com/yozhikOm/ai-for-developers-project-387/pull/9
+[p10]: https://github.com/yozhikOm/ai-for-developers-project-387/pull/10
+[p12]: https://github.com/yozhikOm/ai-for-developers-project-387/pull/12
+[p13]: https://github.com/yozhikOm/ai-for-developers-project-387/pull/13
+
 ---
 
 <details>
