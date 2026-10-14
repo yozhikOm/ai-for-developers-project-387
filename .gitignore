@@ -14,5 +14,8 @@ data/
 test-results/
 playwright-report/
 
+# Отчёт Lighthouse (еженедельный аудит в CI)
+lighthouse-report.json
+
 # Логи и временные файлы
 *.log

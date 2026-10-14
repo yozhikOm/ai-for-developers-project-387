@@ -2,7 +2,7 @@ name: Weekly Documentation Audit
 
 on:
   schedule:
-    - cron: "0 9 * * 1" # Every Monday at 9am UTC
+    - cron: "0 9 * * 4" # Every Thursday at 9am UTC
   workflow_dispatch:
 jobs:
   opencode:
@@ -22,6 +22,7 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GH_TOKEN: ${{ github.token }} # для gh в shell агента: создание issue (permissions: issues: write)
         with:
           model: opencode/big-pickle
           prompt: |

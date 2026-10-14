@@ -22,6 +22,7 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GH_TOKEN: ${{ github.token }} # для gh в shell агента: создание issue (permissions: issues: write)
         with:
           model: opencode/big-pickle
           prompt: |

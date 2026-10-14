@@ -2,7 +2,7 @@ name: Weekly Lighthouse Audit
 
 on:
   schedule:
-    - cron: "0 9 * * 1" # Every Monday at 9am UTC
+    - cron: "0 9 * * 2" # Every Tuesday at 9am UTC
   workflow_dispatch:
 jobs:
   opencode:
@@ -31,6 +31,7 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
+          GH_TOKEN: ${{ github.token }} # для gh в shell агента: создание issue (permissions: issues: write)
         with:
           model: opencode/kimi-k3
           prompt: |
