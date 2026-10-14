@@ -10,7 +10,7 @@
 
 ## Демо
 
-Приложение задеплоено на Render: https://ai-for-developers-project-386-og4b.onrender.com/
+Приложение задеплоено на Render: https://ai-for-developers-project-387-by33.onrender.com/
 
 Это деплой проекта 386, из которого перенесён код этого репозитория.
 
