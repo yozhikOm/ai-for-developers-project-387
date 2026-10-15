@@ -1,7 +1,7 @@
 # Календарь звонков (продолжение)
 
 
-[![hexlet-check](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/yozhikOm/ai-for-developers-project-387/actions)
+[![hexlet-check](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/hexlet-check.yml)
 
 Интегрируйте работу агентов в GitHub проект
 
@@ -29,7 +29,7 @@ SQLite-база сбрасывается и заново засевается с
 
 ## Установка
 
-Требования: Node.js 24+ (см. `.nvmrc`), npm 11.
+Требования: Node.js 24.12+ (см. `engines` в `package.json` и `.nvmrc`), npm 11.
 
 ```bash
 git clone https://github.com/yozhikOm/ai-for-developers-project-387.git
