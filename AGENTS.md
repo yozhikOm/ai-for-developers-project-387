@@ -26,7 +26,9 @@
 - `apps/web` — frontend: React 19, TypeScript, Vite. В dev-режиме proxy `/api` →
   `localhost:3000`. Запросы к API — только через сгенерированный SDK
   (`@/api/generated`).
-- `scripts/smoke.mjs` — smoke test на чистом Node, без зависимостей.
+- `scripts/smoke.mjs` — smoke test на чистом Node, без зависимостей: сам поднимает
+  сервер (порт 3100, временная БД) либо проверяет уже запущенное приложение по
+  `SMOKE_URL`.
 - `e2e/` + `playwright.config.ts` (корень) — сквозной сценарий в браузере
   (Playwright, только Chromium). Сервер поднимает сам Playwright, как `npm start`,
   на свежей временной БД; пояс браузера намеренно отличается от пояса Owner.
@@ -48,7 +50,7 @@
 | `npm run check` | lint + typecheck + тесты (без генерации). **Запускать обязательно перед завершением любой задачи** |
 | `npm run build` | сборка frontend в `apps/web/dist` |
 | `npm start` | prod-режим: один процесс, порт 3000 (API + статика) |
-| `npm run smoke` | smoke test запущенного приложения (требует предварительный `npm run build`) |
+| `npm run smoke` | smoke test (требует предварительный `npm run build`): сервер поднимает сам на порту 3100 с временной БД; `SMOKE_URL=<url>` — проверка уже запущенного приложения |
 | `npm run e2e` | e2e-сценарий в Chromium (требует `npm run build` и один раз `npx playwright install chromium`); в `check` не входит |
 | `npm run docker:build` / `npm run docker:run` | сборка и запуск Docker-образа |
 
