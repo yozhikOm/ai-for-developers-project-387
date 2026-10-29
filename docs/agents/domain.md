@@ -35,6 +35,11 @@
 multi-context: `GLOSSARY-MAP.md` в корне плюс свой `GLOSSARY.md` и
 `docs/adr/` внутри каждого контекста.
 
+Контракт API — `contract/main.tsp` (ADR 0003, 0004): из него командой
+`npm run generate` собираются OpenAPI и код в `contract/generated/`,
+`apps/api/src/generated/` и `apps/web/src/api/generated/`. Сгенерированное
+руками не правится.
+
 ## Используй словарь глоссария
 
 Когда твой вывод называет доменное понятие (в заголовке задачи, предложении по
