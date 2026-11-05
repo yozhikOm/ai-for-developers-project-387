@@ -1,7 +1,13 @@
 # Генераторы OpenAPI, клиентского SDK и серверных артефактов
 
+> Исторический снимок на 2026-10-02: исследование перед внедрением. Текущее
+> состояние конвейера описано в [ADR 0004](../adr/0004-generation-pipeline-hey-api-openapi-glue.md),
+> фактические настройки — в `openapi-ts.config.ts` и `contract/tspconfig.yaml`;
+> примеры ниже могут расходиться с кодом.
+
 Исследование к issue [#14](https://github.com/yozhikOm/ai-for-developers-project-386/issues/14)
-(карта [#6](https://github.com/yozhikOm/ai-for-developers-project-386/issues/6)).
+(карта [#6](https://github.com/yozhikOm/ai-for-developers-project-386/issues/6)) —
+репозиторий 386, предыдущий проект.
 Дата: 2026-10-02. Версии взяты из npm registry (`npm view <pkg> version time`),
 поведение проверено по документации и исходникам, ключевые утверждения проверены
 сквозным прогоном в одноразовом проекте (см. раздел «Проверка»).
@@ -104,7 +110,8 @@ options:
   только union-типы; `'javascript'` даёт объект, `'typescript'` — TS `enum`
   ([плагин TypeScript](https://heyapi.dev/docs/openapi/typescript/plugins/typescript)).
   Проверено: `enum SlotStatus` из TypeSpec превратился в
-  `export type SlotStatus = 'free' | 'busy'`.
+  `export type SlotStatus = 'free' | 'busy'` (в текущем контракте — `'free' | 'taken'`,
+  см. `contract/main.tsp`).
 - **Рантайм:** fetch-клиент используется по умолчанию. С v0.73.0 он вшит в
   `@hey-api/openapi-ts` (`npm view @hey-api/client-fetch deprecated` →
   «bundled directly inside @hey-api/openapi-ts»), поэтому в `apps/web` нет
@@ -266,12 +273,17 @@ export default defineConfig([
 ])
 ```
 
+В фактическом `openapi-ts.config.ts` у серверного job'а ещё `source: true`:
+рядом с типами кладётся копия спеки `source.json`, по ней `fastify-openapi-glue`
+регистрирует маршруты (ADR 0004).
+
 ### Коммитить ли сгенерированное
 
 Рекомендация: **коммитить** `openapi.yaml` и TS-артефакты, а в CI добавить
 проверку дрейфа (`npm run generate && git diff --exit-code`).
 
-- Плюсы: CI (`ci.yml`: lint → typecheck → test → build → smoke) и Docker
+- Плюсы: CI (`ci.yml`: lint → typecheck → test → build → smoke; сейчас там ещё
+  проверка дрейфа, e2e и Docker) и Docker
   (`npm ci` + `COPY . .`) работают без шага генерации. Ревьюер Хекслета видит
   OpenAPI в репозитории. Изменения контракта видны в diff PR. Проверка дрейфа
   ловит ручные правки сгенерированного.
@@ -315,7 +327,10 @@ export default defineConfig([
    `@scalar` (зависимость openapi3) ~8 MB — всё это devDependencies. В рантайм
    попадает только `fastify-openapi-glue` (~126 KB) и его 3 зависимости.
 
-## Открытые вопросы (решение человека)
+## Открытые вопросы на момент исследования (решены при внедрении)
+
+Ниже — вопросы, открытые на дату исследования; все пять решены в ADR 0004 и
+фактическом коде.
 
 1. Коммитить ли сгенерированные файлы (рекомендация — да, с проверкой дрейфа в CI).
 2. Как именовать операции: `interface` + `operationResolver` или операции в
