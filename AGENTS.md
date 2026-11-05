@@ -48,7 +48,7 @@
 | `npm run check` | lint + typecheck + тесты (без генерации). **Запускать обязательно перед завершением любой задачи** |
 | `npm run build` | сборка frontend в `apps/web/dist` |
 | `npm start` | prod-режим: один процесс, порт 3000 (API + статика) |
-| `npm run smoke` | smoke test запущенного приложения (требует предварительный `npm run build`) |
+| `npm run smoke` | smoke test (требует предварительный `npm run build`): сервер поднимает сам на порту 3100 с временной БД; `SMOKE_URL=<url>` — проверка уже запущенного приложения |
 | `npm run e2e` | e2e-сценарий в Chromium (требует `npm run build` и один раз `npx playwright install chromium`); в `check` не входит |
 | `npm run docker:build` / `npm run docker:run` | сборка и запуск Docker-образа |
 

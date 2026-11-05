@@ -1,7 +1,7 @@
 # Календарь звонков (продолжение)
 
 
-[![hexlet-check](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/yozhikOm/ai-for-developers-project-387/actions)
+[![hexlet-check](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/hexlet-check.yml)
 
 Интегрируйте работу агентов в GitHub проект
 
@@ -29,7 +29,7 @@ SQLite-база сбрасывается и заново засевается с
 
 ## Установка
 
-Требования: Node.js 24+ (см. `.nvmrc`), npm 11.
+Требования: Node.js 24.12+ (см. `engines` в `package.json`), npm 11.
 
 ```bash
 git clone https://github.com/yozhikOm/ai-for-developers-project-387.git
@@ -58,7 +58,7 @@ npm run generate
 
 # Проверки
 npm run check          # lint + typecheck + тесты
-npm run smoke          # smoke test запущенного приложения (после npm run build)
+npm run smoke          # smoke test (после npm run build): сам поднимает сервер на 3100
 npm run e2e            # сквозной сценарий в браузере (после npm run build;
                        # один раз: npx playwright install chromium)
 
@@ -69,6 +69,10 @@ npm run docker:run     # запуск на http://localhost:3000, данные �
 # Другой порт внутри контейнера задаётся переменной PORT
 docker run --rm -e PORT=8080 -p 8080:8080 call-calendar
 ```
+
+`npm run smoke` без переменных сам поднимает собранное приложение на порту 3100
+с временной БД. Чтобы проверить уже запущенное приложение, задайте адрес:
+`SMOKE_URL=http://localhost:3000 npm run smoke`.
 
 ## Воркфлоу GitHub Actions
 
@@ -81,12 +85,16 @@ docker run --rm -e PORT=8080 -p 8080:8080 call-calendar
 | [CI](.github/workflows/ci.yml) | `push`, `pull_request` | — | Дрейф генерации, lint, typecheck, тесты, build, smoke, e2e; сборка и smoke Docker-образа | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/ci.yml), чеки коммита и PR |
 | [Release Please](.github/workflows/release-please.yml) | `push` в `main` | — | Release-PR (версия + `CHANGELOG.md`); при его мерже — тег и GitHub Release | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/release-please.yml), PR от release-please, Releases |
 | [hexlet-check](.github/workflows/hexlet-check.yml) | `push` в любую ветку или тег | — | Автотесты Хекслета (файл не изменять) | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/hexlet-check.yml), бейдж в начале README |
-| [opencode](.github/workflows/opencode.yml) | Комментарий в issue или PR с `/oc` / `/opencode` | `opencode/kimi-k3` | Агент выполняет запрос из комментария (коммиты — по Conventional Commits) | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/opencode.yml), ответ в треде issue/PR |
+| [opencode](.github/workflows/opencode.yml) | Комментарий в issue или PR с упоминанием `/oc` / `/opencode` (после пробела или другого текста) | `opencode/kimi-k3` | Агент выполняет запрос из комментария (коммиты — по Conventional Commits) | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/opencode.yml), ответ в треде issue/PR |
 | [OpenCode PR Review](.github/workflows/opencode-review.yml) | `pull_request`: opened, synchronize, reopened, ready_for_review (кроме PR от ботов) | `opencode/kimi-k3` | Ревью PR: баги, рискованные изменения, читаемость | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/opencode-review.yml), комментарии в PR |
 | [Issue Triage](.github/workflows/opencode-triage.yml) | `issues`: opened (аккаунту автора ≥ 30 дней) | `opencode/big-pickle` | Комментарий со ссылками на документацию и подсказками, если решение очевидно | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/opencode-triage.yml), комментарий в issue |
 | [Weekly Code Audit](.github/workflows/opencode-code-audit.yml) | cron: пн 09:00 UTC | `opencode/big-pickle` | Сбор TODO / FIXME / HACK, сводка по приоритетам в одной issue | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/opencode-code-audit.yml), Issues |
 | [Weekly Lighthouse Audit](.github/workflows/opencode-lighthouse.yml) | cron: вт 09:00 UTC | `opencode/kimi-k3` | Lighthouse по `LIGHTHOUSE_URL`, сравнение LCP / CLS / INP с `docs/performance-baseline.md`, issue при деградации | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/opencode-lighthouse.yml), Issues |
 | [Weekly Documentation Audit](.github/workflows/opencode-documentation-audit.yml) | cron: чт 09:00 UTC | `opencode/big-pickle` | Сверка README и `docs/` с кодом: PR с правками и issue с тем, что требует человека | [Actions](https://github.com/yozhikOm/ai-for-developers-project-387/actions/workflows/opencode-documentation-audit.yml), PR и Issues |
+
+Упоминание `/oc` или `/opencode` должно идти после пробела или другого текста:
+воркфлоу проверяет `contains(body, ' /oc')`, поэтому комментарий, начинающийся
+с `/oc`, агента не запускает.
 
 ## Самооценка работы агента
 
