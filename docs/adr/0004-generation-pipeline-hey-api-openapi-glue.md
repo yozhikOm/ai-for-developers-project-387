@@ -32,10 +32,11 @@ beta-плагин `fastify`) в `apps/api/src/generated/` вместе с коп
 - Сервис объявлен с `@route("/api")`: пути в OpenAPI равны реальным URL, префикс
   не настраивается ни в glue, ни в SDK. `/api/health` тоже описан в контракте
   (`getHealth`).
-- Все 4xx/5xx отвечают одной моделью `ApiError { code, message }`: Fastify
-  сериализует ответ по схеме из контракта. Ошибки валидации и неизвестные
-  маршруты `/api` приводятся к ней через `setErrorHandler`. Клиент различает
-  причины по `code`.
+- Все 4xx/5xx API отвечают одной моделью `ApiError { code, message }`: Fastify
+  сериализует ответ по схеме из контракта. Ошибки валидации и непредвиденные
+  ошибки приводит к ней `setErrorHandler`, а неизвестные маршруты `/api` —
+  `setNotFoundHandler` (см. `apps/api/src/errors.ts`). Клиент различает причины
+  по `code`.
 - Сгенерированное коммитится; CI проверяет дрейф
   `npm run generate && git diff --exit-code`. `npm run check` генерацию не
   запускает.

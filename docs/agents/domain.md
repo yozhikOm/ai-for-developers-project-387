@@ -23,8 +23,11 @@
 /
 ├── GLOSSARY.md
 ├── docs/adr/
-│   ├── 0001-....md
-│   └── 0002-....md
+│   ├── 0001-client-side-routing-react-router.md
+│   ├── 0002-shadcn-ui-tailwind.md
+│   ├── 0003-design-first-typespec-contract.md
+│   ├── 0004-generation-pipeline-hey-api-openapi-glue.md
+│   └── 0005-sqlite-node-sqlite-storage.md
 ├── docs/agents/          ← эти файлы: конфигурация скиллов
 └── apps/
     ├── api/
@@ -34,6 +37,11 @@
 Если понадобится разделение по контекстам, можно будет перейти на
 multi-context: `GLOSSARY-MAP.md` в корне плюс свой `GLOSSARY.md` и
 `docs/adr/` внутри каждого контекста.
+
+Контракт API — `contract/main.tsp` (ADR 0003, 0004): из него командой
+`npm run generate` собираются OpenAPI и код в `contract/generated/`,
+`apps/api/src/generated/` и `apps/web/src/api/generated/`. Сгенерированное
+руками не правится.
 
 ## Используй словарь глоссария
 

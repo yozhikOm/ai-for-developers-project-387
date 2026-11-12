@@ -1,7 +1,9 @@
 # Performance baseline (LCP, CLS, INP)
 
 Исходный baseline web-vitals главной страницы, зафиксирован по отчёту
-Lighthouse (`lighthouse-report.json`) от 2026-10-14. Заведён по тикету
+Lighthouse от 2026-10-14. Файл отчёта `lighthouse-report.json` создаётся только в
+запуске воркфлоу `opencode-lighthouse.yml` и в репозиторий не коммитится
+(см. `.gitignore`). Заведён по тикету
 [#11](https://github.com/yozhikOm/ai-for-developers-project-387/issues/11).
 При следующих замерах значения сравниваются с этим baseline по правилу из
 раздела «Правило сравнения».
