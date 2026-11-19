@@ -13,7 +13,7 @@
 | Контракт → OpenAPI | `@typespec/compiler` + `@typespec/http` + `@typespec/openapi` + `@typespec/openapi3` 1.16.0 | `contract/generated/openapi.yaml` (OpenAPI 3.0.0) |
 | OpenAPI → SDK для `apps/web` | `@hey-api/openapi-ts` 0.99.0, плагины `@hey-api/client-fetch` + `@hey-api/typescript` + `@hey-api/sdk` | типы + функции-запросы на `fetch`, рантайм клиента вшит в сгенерированный код, без зависимостей |
 | OpenAPI → артефакты для `apps/api` | тот же `@hey-api/openapi-ts`, плагины `@hey-api/typescript` + `fastify` | `RouteHandlers` — типы обработчиков (`Params`/`Body`/`Querystring`/`Reply`) |
-| Маршруты + проверка запросов | `fastify-openapi-glue` 4.11.5 (рантайм-зависимость `apps/api`) | при старте читает `openapi.yaml`, регистрирует маршруты и JSON Schema для Ajv Fastify |
+| Маршруты + проверка запросов | `fastify-openapi-glue` 4.11.5 (рантайм-зависимость `apps/api`) | при старте читает спеку (в текущем коде — копию `apps/api/src/generated/source.json`), регистрирует маршруты и JSON Schema для Ajv Fastify |
 
 Раскладка: `.tsp` — в каталоге `contract/` в корне (не workspace-пакет);
 сгенерированный TS-код — внутри потребителей (`apps/web/src/api/generated/`,
