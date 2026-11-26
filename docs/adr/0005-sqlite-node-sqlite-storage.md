@@ -5,7 +5,8 @@ EventType и Booking хранятся в файле SQLite, доступ — в�
 npm-зависимостей и нативной сборки не нужно. В Node 24.21 модуль работает без
 флага и без `ExperimentalWarning`, но официально ещё не stable — это осознанный
 риск ради нулевых зависимостей. Решение принято в тикете
-[Хранение данных](https://github.com/yozhikOm/ai-for-developers-project-386/issues/17).
+[Хранение данных](https://github.com/yozhikOm/ai-for-developers-project-386/issues/17)
+(репозиторий 386 — предыдущий проект).
 
 ## Considered Options
 
