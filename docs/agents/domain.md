@@ -23,8 +23,11 @@
 /
 ├── GLOSSARY.md
 ├── docs/adr/
-│   ├── 0001-....md
-│   └── 0002-....md
+│   ├── 0001-client-side-routing-react-router.md
+│   ├── 0002-shadcn-ui-tailwind.md
+│   ├── 0003-design-first-typespec-contract.md
+│   ├── 0004-generation-pipeline-hey-api-openapi-glue.md
+│   └── 0005-sqlite-node-sqlite-storage.md
 ├── docs/agents/          ← эти файлы: конфигурация скиллов
 └── apps/
     ├── api/

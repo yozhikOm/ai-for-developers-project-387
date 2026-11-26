@@ -1,7 +1,13 @@
 # Генераторы OpenAPI, клиентского SDK и серверных артефактов
 
+> Исторический снимок на 2026-10-02: исследование перед внедрением. Текущее
+> состояние конвейера описано в [ADR 0004](../adr/0004-generation-pipeline-hey-api-openapi-glue.md),
+> фактические настройки — в `openapi-ts.config.ts` и `contract/tspconfig.yaml`;
+> примеры ниже могут расходиться с кодом.
+
 Исследование к issue [#14](https://github.com/yozhikOm/ai-for-developers-project-386/issues/14)
-(карта [#6](https://github.com/yozhikOm/ai-for-developers-project-386/issues/6)).
+(карта [#6](https://github.com/yozhikOm/ai-for-developers-project-386/issues/6)) —
+репозиторий 386, предыдущий проект.
 Дата: 2026-10-02. Версии взяты из npm registry (`npm view <pkg> version time`),
 поведение проверено по документации и исходникам, ключевые утверждения проверены
 сквозным прогоном в одноразовом проекте (см. раздел «Проверка»).
@@ -13,7 +19,7 @@
 | Контракт → OpenAPI | `@typespec/compiler` + `@typespec/http` + `@typespec/openapi` + `@typespec/openapi3` 1.16.0 | `contract/generated/openapi.yaml` (OpenAPI 3.0.0) |
 | OpenAPI → SDK для `apps/web` | `@hey-api/openapi-ts` 0.99.0, плагины `@hey-api/client-fetch` + `@hey-api/typescript` + `@hey-api/sdk` | типы + функции-запросы на `fetch`, рантайм клиента вшит в сгенерированный код, без зависимостей |
 | OpenAPI → артефакты для `apps/api` | тот же `@hey-api/openapi-ts`, плагины `@hey-api/typescript` + `fastify` | `RouteHandlers` — типы обработчиков (`Params`/`Body`/`Querystring`/`Reply`) |
-| Маршруты + проверка запросов | `fastify-openapi-glue` 4.11.5 (рантайм-зависимость `apps/api`) | при старте читает `openapi.yaml`, регистрирует маршруты и JSON Schema для Ajv Fastify |
+| Маршруты + проверка запросов | `fastify-openapi-glue` 4.11.5 (рантайм-зависимость `apps/api`) | при старте читает спеку (в текущем коде — копию `apps/api/src/generated/source.json`), регистрирует маршруты и JSON Schema для Ajv Fastify |
 
 Раскладка: `.tsp` — в каталоге `contract/` в корне (не workspace-пакет);
 сгенерированный TS-код — внутри потребителей (`apps/web/src/api/generated/`,
@@ -104,7 +110,8 @@ options:
   только union-типы; `'javascript'` даёт объект, `'typescript'` — TS `enum`
   ([плагин TypeScript](https://heyapi.dev/docs/openapi/typescript/plugins/typescript)).
   Проверено: `enum SlotStatus` из TypeSpec превратился в
-  `export type SlotStatus = 'free' | 'busy'`.
+  `export type SlotStatus = 'free' | 'busy'` (в текущем контракте — `'free' | 'taken'`,
+  см. `contract/main.tsp`).
 - **Рантайм:** fetch-клиент используется по умолчанию. С v0.73.0 он вшит в
   `@hey-api/openapi-ts` (`npm view @hey-api/client-fetch deprecated` →
   «bundled directly inside @hey-api/openapi-ts»), поэтому в `apps/web` нет
@@ -266,12 +273,17 @@ export default defineConfig([
 ])
 ```
 
+В фактическом `openapi-ts.config.ts` у серверного job'а ещё `source: true`:
+рядом с типами кладётся копия спеки `source.json`, по ней `fastify-openapi-glue`
+регистрирует маршруты (ADR 0004).
+
 ### Коммитить ли сгенерированное
 
 Рекомендация: **коммитить** `openapi.yaml` и TS-артефакты, а в CI добавить
 проверку дрейфа (`npm run generate && git diff --exit-code`).
 
-- Плюсы: CI (`ci.yml`: lint → typecheck → test → build → smoke) и Docker
+- Плюсы: CI (`ci.yml`: lint → typecheck → test → build → smoke; сейчас там ещё
+  проверка дрейфа, e2e и Docker) и Docker
   (`npm ci` + `COPY . .`) работают без шага генерации. Ревьюер Хекслета видит
   OpenAPI в репозитории. Изменения контракта видны в diff PR. Проверка дрейфа
   ловит ручные правки сгенерированного.
@@ -289,9 +301,10 @@ export default defineConfig([
   генератора не обязан проходить правила проекта, правок руками он не допускает.
 - Ответы 4xx/5xx, описанные в контракте, проходят через сериализацию Fastify по
   response-схеме. В прогоне ошибка валидации Fastify (`statusCode`, `error`,
-  `message`) ушла клиенту как `{"message": "..."}`, потому что схема
-  `ApiError` содержит только `message`. Формат ошибок нужно согласовать с
-  контрактом.
+  `message`) ушла клиенту как `{"message": "..."}`, потому что в схеме `ApiError`
+  из одноразового проекта было только поле `message` (в текущем контракте
+  обязательны `code` и `message`, см. `contract/main.tsp`). Формат ошибок нужно
+  согласовать с контрактом.
 
 ## Проверка
 
@@ -310,12 +323,16 @@ export default defineConfig([
 3. `node api/src/server.ts` (нативный type stripping, Fastify + glue +
    `RouteHandlers`): с `serviceHandlers` — 500 для операций из `interface`
    (ловушка с operationId). С `operationResolver` — 200/404/201, `POST` с
-   `durationMinutes: 1` → 400 `body/durationMinutes must be >= 5`.
+   `durationMinutes: 1` → 400 `body/durationMinutes must be >= 5` (минимум в
+   контракте одноразового проекта; сейчас `@minValue(15)` в `contract/main.tsp`).
 4. Размер в `node_modules`: `@typespec` ~9 MB, `@hey-api` ~5 MB,
    `@scalar` (зависимость openapi3) ~8 MB — всё это devDependencies. В рантайм
    попадает только `fastify-openapi-glue` (~126 KB) и его 3 зависимости.
 
-## Открытые вопросы (решение человека)
+## Открытые вопросы на момент исследования (решены при внедрении)
+
+Ниже — вопросы, открытые на дату исследования; все пять решены в ADR 0004 и
+фактическом коде.
 
 1. Коммитить ли сгенерированные файлы (рекомендация — да, с проверкой дрейфа в CI).
 2. Как именовать операции: `interface` + `operationResolver` или операции в
